@@ -18,51 +18,6 @@ constexpr UINT64 IMAGE_FILE_NAME_OFFSET = 0x05a8;
 
 constexpr int pid = 4;
 
-
-void TestWrite() {
-
-	PCUCHAR buffer = (unsigned const char[])"hi :333";  //  for example
-	ULONG bufferSize = sizeof(buffer);
-
-	UNICODE_STRING      filePath;   //  Must be with DOS prefix: \??\C:\MyFolder\logs.txt
-	HANDLE              hFile;
-	OBJECT_ATTRIBUTES   ObjectAttributes;
-	IO_STATUS_BLOCK     IoStatusBlock;
-	RtlCreateUnicodeString(&filePath, L"\\??\\C:\\logs.txt");
-	InitializeObjectAttributes(&ObjectAttributes, &filePath, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
-
-	NTSTATUS Status = ZwCreateFile(&hFile, FILE_GENERIC_READ | FILE_GENERIC_WRITE, &ObjectAttributes,
-		&IoStatusBlock, NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_CREATE,
-		FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
-
-	Status = ZwWriteFile(hFile, NULL, NULL, NULL, &IoStatusBlock, (PVOID)buffer, bufferSize, NULL, NULL);
-	RtlFreeUnicodeString(&filePath);
-	ZwClose(hFile);
-}
-
-void TestWrite(UNICODE_STRING buf, PCWCHAR name) {
-
-	PCUCHAR buffer = (PCUCHAR)buf.Buffer;  //  for example
-	ULONG bufferSize = buf.MaximumLength;
-
-	UNICODE_STRING      filePath;   //  Must be with DOS prefix: \??\C:\MyFolder\logs.txt
-	HANDLE              hFile;
-	OBJECT_ATTRIBUTES   ObjectAttributes;
-	IO_STATUS_BLOCK     IoStatusBlock;
-	RtlCreateUnicodeString(&filePath, name);
-	InitializeObjectAttributes(&ObjectAttributes, &filePath, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
-
-	NTSTATUS Status = ZwCreateFile(&hFile, FILE_GENERIC_READ | FILE_GENERIC_WRITE, &ObjectAttributes,
-		&IoStatusBlock, NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_CREATE,
-		FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
-
-	Status = ZwWriteFile(hFile, NULL, NULL, NULL, &IoStatusBlock, (PVOID)buffer, bufferSize, NULL, NULL);
-	RtlFreeUnicodeString(&filePath);
-	ZwClose(hFile);
-}
-
-
-
 extern "C"
 NTSTATUS DriverEntry(
 	_In_  struct _DRIVER_OBJECT* DriverObject,
@@ -77,7 +32,7 @@ NTSTATUS DriverEntry(
 	NTSTATUS status = PsLookupProcessByProcessId((HANDLE)pid, &pEprocess); //lookup the process by its id;
 	if (status != STATUS_SUCCESS)
 	{
-		TestWrite();
+		DbgPrint("Unable to find process");
 		return 0;
 	}
 
