@@ -1,4 +1,4 @@
-# driver to rename process     
+# driver to rename process(at runtime! :D) 
 # how 2 use:    
 set pid and ur process name then compile, use [magic](https://github.com/hfiref0x/KDU) to load   
 it only changes stuff in the eprocess entry so process name should be "visibly" unaffected, you should be able to see changes when you use Get-Process on powershell  
